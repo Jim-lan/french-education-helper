@@ -65,6 +65,8 @@ describe("homework UI with synthetic responses", () => {
     );
     expect(await screen.findByText(content.englishTranslation)).toBeTruthy();
     expect(screen.getByText(content.studentExplanation)).toBeTruthy();
+    expect(screen.getByText("Word meanings")).toBeTruthy();
+    expect(screen.getByText("text / passage")).toBeTruthy();
     expect(document.querySelector(".french-source")?.textContent).toBe(
       content.originalFrench,
     );
@@ -83,6 +85,15 @@ describe("homework UI with synthetic responses", () => {
       lang: "fr-CA",
     });
     expect(fetcher).toHaveBeenCalledOnce();
+    await user.click(screen.getByText("Word meanings"));
+    expect(
+      document.querySelector("details.word-meanings")?.hasAttribute("open"),
+    ).toBe(false);
+    await user.click(screen.getByText("Word meanings"));
+    expect(
+      document.querySelector("details.word-meanings")?.hasAttribute("open"),
+    ).toBe(true);
+    expect(fetcher).toHaveBeenCalledOnce();
   });
   it("keeps the original image visible and supports correction using the text path", async () => {
     const user = userEvent.setup();
@@ -100,6 +111,7 @@ describe("homework UI with synthetic responses", () => {
       screen.getByRole("button", { name: /Help me understand/ }),
     );
     expect(await screen.findByText("The French, transcribed")).toBeTruthy();
+    expect(screen.getByText("text / passage")).toBeTruthy();
     expect(screen.getByAltText(/Original uploaded homework/)).toBeTruthy();
     expect(fetcher.mock.calls[0][1].body.get("image").name).toBe(
       "teacher-note.png",

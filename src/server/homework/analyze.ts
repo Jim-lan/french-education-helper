@@ -4,6 +4,7 @@ import {
   HomeworkAnalysisSchema,
 } from "@/lib/homework/schema";
 import { segmentFrench } from "@/lib/french/segment";
+import { normalizeWordMeanings } from "@/lib/french/meanings";
 import type { HomeworkInput, LLMProvider } from "../llm/types";
 import { AppError } from "../errors";
 import { validateText } from "./input";
@@ -32,6 +33,10 @@ export async function analyzeHomework(
   return HomeworkAnalysisSchema.parse({
     ...content.data,
     originalFrench,
+    wordMeanings: normalizeWordMeanings(
+      originalFrench,
+      content.data.wordMeanings,
+    ),
     schemaVersion: "1",
     sourceType: input.kind,
     sentences: segmentFrench(originalFrench),

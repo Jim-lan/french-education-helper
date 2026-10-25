@@ -93,8 +93,18 @@ is intended for a trusted home network; do not configure internet port forwardin
 2. Paste the teacher's text or choose a clear JPEG, PNG, or WebP image.
 3. Select **Help me understand**.
 4. Read the French, natural English translation, and **What do I need to do?**
+   The expanded **Word meanings** section under the translation shows short English
+   meanings for individual French words. Collapse it when you want to focus on
+   the full sentence. Repeated words appear once; contractions stay together.
 5. Tap a French word to hear it, or use a speaker to hear the complete sentence.
    **Stop audio** cancels playback.
+
+Word meanings are generated as part of the original analysis, with no extra API
+request when expanding the section or tapping words. They reflect the note's
+context and may differ from a literal sentence translation. Up to 500 distinct
+words receive definitions; omitted or uncertain meanings show **Not available**.
+Analyze an older result again to obtain meanings. Check these AI-generated
+definitions against the source just as you would the full translation.
 
 For photos, the original remains visible as the source of truth. Extracted text
 is labeled as an AI transcription. Check uncertain content against the image;

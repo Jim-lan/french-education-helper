@@ -1008,3 +1008,66 @@ textarea::placeholder {
   line-height: 1.5;
   vertical-align: baseline;
 }
+
+.word-meanings {
+  border-top: 1px solid var(--line);
+  margin-top: 27px;
+  padding-top: 16px;
+}
+.word-meanings summary {
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.7;
+  padding: 9px 0;
+}
+.word-meanings summary::marker {
+  color: #6c8968;
+}
+.word-meanings summary:focus-visible {
+  outline: 3px solid #bd791c;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.word-count {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+.word-meanings-list {
+  margin: 16px 0 0;
+}
+.word-meaning-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 15px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-top: 1px solid #edf0e9;
+}
+.word-meaning-row dt {
+  font-family: Georgia, serif;
+  font-size: 19px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.word-meaning-row dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #526c59;
+  overflow-wrap: anywhere;
+}
+.meaning-unavailable,
+.meaning-note {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+}
+.meaning-note {
+  margin-top: 12px;
+  line-height: 1.7;
+}

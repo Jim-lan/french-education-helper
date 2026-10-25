@@ -1,6 +1,7 @@
 "use client";
 import type { HomeworkAnalysis } from "@/types/homework";
 import { FrenchText } from "./FrenchText";
+import { WordMeanings } from "./WordMeanings";
 export function HomeworkResults({
   analysis,
   onCorrect,
@@ -55,6 +56,7 @@ export function HomeworkResults({
             A natural translation of the teacher’s words.
           </p>
           <p className="translation">{analysis.englishTranslation}</p>
+          <WordMeanings analysis={analysis} />
         </article>
       </div>
       <article className="instruction-panel">

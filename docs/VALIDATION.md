@@ -8,6 +8,8 @@ Validation performed October 25, 2026, after the owner approved the implementati
 - Pasted French and JPEG/PNG/WebP image inputs with one shared response schema.
 - Exact pasted-text preservation, including whitespace and line endings.
 - Natural English translation, simple instructions, steps, and extraction warnings.
+- Contextual word meanings beneath the translation, included in the same AI response;
+  source spelling/order, deduplication, contractions, and explicit unavailable entries.
 - Original image retained for comparison, with transcription correction through the text workflow.
 - Application-owned Zod validation and deterministic French sentence/word segmentation.
 - Server-only Gemini adapter behind `LLMProvider`, with configurable provider/model.
@@ -22,7 +24,7 @@ Validation performed October 25, 2026, after the owner approved the implementati
 
 | Check | Result |
 | --- | --- |
-| `npm test` | 59 tests passed in 10 files; no live API usage |
+| `npm test` | 65 tests passed in 11 files; no live API usage |
 | `npm run typecheck` | Passed |
 | `npm run build` | Passed |
 | Docker image build | Passed with Node.js 24 |
@@ -43,6 +45,9 @@ source offsets and reconstruction, provider selection/configuration, malformed/r
 or truncated model output, upstream status errors, adapter image encoding, exact text
 preservation, image signatures/limits, missing Content-Length, a stalled upload timeout,
 process-local limits, safe route errors, and mocked text/image UI workflows.
+Word-meaning checks cover backward-compatible omitted dictionaries, invalid entries,
+normalization of case/accents/apostrophes, source grounding, deduplication, missing
+meanings, image/text rendering, and expansion/collapse without extra API calls.
 
 A test-only provider with a different provider ID verifies the service is independent
 of Gemini. Production does not offer a mock provider. DOM workflow tests verify word
@@ -64,6 +69,8 @@ Local host checks ran on the Mac's installed Node.js 25.4.0. The project targets
 - The preview browser reported an available Canadian French voice. This is not an
   audible playback or physical-device acceptance test.
 - Removed the temporary QA route before the final production build/container checks.
+- Word-meaning enhancement: inspected the contextual glossary in the desktop results,
+  verified native expand/collapse controls, and confirmed no overflow at 390px.
 
 ## Remaining acceptance checks
 

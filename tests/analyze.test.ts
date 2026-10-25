@@ -35,6 +35,24 @@ describe("provider-independent homework service", () => {
     );
     expect(result.sourceType).toBe("image");
     expect(result.sentences).toHaveLength(2);
+    expect(result.wordMeanings).toEqual(content.wordMeanings);
+  });
+  it("grounds provider meanings in the submitted source, not a model rewrite", async () => {
+    const provider = stub();
+    vi.mocked(provider.analyzeHomework).mockResolvedValue({
+      ...content,
+      wordMeanings: [
+        { french: "Lis", english: "read" },
+        { french: "chat", english: "cat" },
+      ],
+    });
+    const result = await analyzeHomework(
+      { kind: "text", text: "  Lis. " },
+      provider,
+      signal,
+    );
+    expect(result.wordMeanings).toEqual([{ french: "Lis", english: "read" }]);
+    expect(result.originalFrench).toBe("  Lis. ");
   });
   it("rejects an adapter with malformed output", async () => {
     const provider = stub();

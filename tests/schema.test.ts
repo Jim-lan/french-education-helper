@@ -6,12 +6,29 @@ import {
 import { segmentFrench } from "@/lib/french/segment";
 import { content } from "./fixtures/analysis";
 describe("application response schema", () => {
+  it("accepts older responses without meanings, and rejects malformed definitions", () => {
+    const { wordMeanings: _meanings, ...legacy } = content;
+    expect(AnalysisContentSchema.parse(legacy).wordMeanings).toEqual([]);
+    for (const wordMeanings of [
+      "a dictionary",
+      [{ french: "Lis", english: "" }],
+      [{ french: "Lis", english: "read", html: "<p>read</p>" }],
+    ]) {
+      expect(
+        AnalysisContentSchema.safeParse({ ...content, wordMeanings }).success,
+      ).toBe(false);
+    }
+  });
   it("rejects sentence endpoints beyond the source length", () => {
     const text = content.originalFrench;
-    expect(HomeworkAnalysisSchema.safeParse({
-      ...content, schemaVersion: "1", sourceType: "text",
-      sentences: [{ text, start: 0, end: text.length + 1 }],
-    }).success).toBe(false);
+    expect(
+      HomeworkAnalysisSchema.safeParse({
+        ...content,
+        schemaVersion: "1",
+        sourceType: "text",
+        sentences: [{ text, start: 0, end: text.length + 1 }],
+      }).success,
+    ).toBe(false);
   });
   const analysis = {
     ...content,

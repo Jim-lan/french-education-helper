@@ -21,6 +21,8 @@ describe("Gemini adapter (mocked HTTP only)", () => {
     expect(
       body.generationConfig.responseJsonSchema.properties.originalFrench,
     ).toBeDefined();
+    expect(body.generationConfig.responseJsonSchema.properties.wordMeanings).toBeDefined();
+    expect(body.contents[0].parts[0].text).toContain('"Lis","le","texte"');
     expect(init?.signal).toBe(signal);
   });
   it("encodes image bytes inside the adapter", async () => {

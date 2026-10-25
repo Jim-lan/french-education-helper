@@ -4,6 +4,15 @@ export const AnalysisContentSchema = z.strictObject({
   originalFrench: z.string().min(1).max(30000),
   englishTranslation: z.string().min(1).max(30000),
   studentExplanation: z.string().min(1).max(10000),
+  wordMeanings: z
+    .array(
+      z.strictObject({
+        french: z.string().min(1).max(10000),
+        english: z.string().min(1).max(160),
+      }),
+    )
+    .max(500)
+    .default([]),
   steps: z.array(z.string().min(1).max(1000)).max(50),
   warnings: z
     .array(

@@ -7,6 +7,14 @@ committed. This document preserves the approved proposal. See
 [VALIDATION.md](VALIDATION.md) for implemented behavior, verification results,
 and checks that still require a configured API key or a physical device.
 
+Approved scope extension (October 25, 2026): the owner requested individual word
+meanings alongside the full English translation. Analysis responses now include
+an optional/default-empty `wordMeanings` array of `{ french, english }` definitions,
+generated in the same provider call and grounded in the original source. The
+English results panel displays the meanings in a collapsible section; word taps
+continue to pronounce French without additional AI requests. This is a compact
+glossary, not the broader future tutoring/history feature set.
+
 Implementation adjustment: pasted text uses an `application/json` body containing
 `{ text }`, because multipart form serialization normalizes line endings. Images
 use multipart form data containing one `image` file. Both return the same
