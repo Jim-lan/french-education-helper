@@ -1,6 +1,18 @@
 # French Education Helper — V1 implementation plan
 
-Status: **proposed; awaiting user approval before Phase 0/Phase 1 work**.
+Status: **approved by the project owner on October 25, 2026; implementation in progress**.
+
+The owner approved proceeding after the specification, plan, and README were
+committed. This document preserves the approved proposal. See
+[VALIDATION.md](VALIDATION.md) for implemented behavior, verification results,
+and checks that still require a configured API key or a physical device.
+
+Implementation adjustment: pasted text uses an `application/json` body containing
+`{ text }`, because multipart form serialization normalizes line endings. Images
+use multipart form data containing one `image` file. Both return the same
+application-owned response schema. French word tokens use deterministic Unicode
+matching for consistent apostrophe/compound behavior; sentence boundaries use
+`Intl.Segmenter` with a line-aware fallback.
 
 The authoritative requirements are [PROJECT_SPEC.md](PROJECT_SPEC.md), copied
 unchanged from the supplied master specification. This plan addresses all ten

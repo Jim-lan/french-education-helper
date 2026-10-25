@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    ports:
+      - "0.0.0.0:3000:3000"
+    env_file:
+      - path: .env.local
+        required: false
+    restart: unless-stopped

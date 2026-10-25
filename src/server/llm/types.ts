@@ -1,0 +1,19 @@
+import "server-only";
+import type { AnalysisContent } from "@/types/homework";
+export type ProviderId = "gemini" | "openai" | "xai";
+export type HomeworkInput =
+  | { kind: "text"; text: string }
+  | {
+      kind: "image";
+      bytes: Uint8Array;
+      mimeType: "image/jpeg" | "image/png" | "image/webp";
+    };
+export interface LLMProvider {
+  readonly id: ProviderId;
+  readonly model: string;
+  readonly capabilities: { imageInput: boolean; structuredOutput: boolean };
+  analyzeHomework(
+    input: HomeworkInput,
+    options: { signal: AbortSignal },
+  ): Promise<AnalysisContent>;
+}
