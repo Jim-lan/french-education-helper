@@ -32,7 +32,7 @@ export function FrenchText({ analysis }: { analysis: HomeworkAnalysis }) {
         sentences={analysis.sentences}
       />
       <div className="speech-status">
-        <span role="status" aria-live="polite">
+        <span>
           {speech.error ||
             (speech.speaking
               ? `${speech.started ? "Playing French" : "Starting French audio"}: ${speech.currentText}`

@@ -25,6 +25,15 @@ export const ReviewContentSchema = z.strictObject({
     .max(12),
   strengths: z.array(z.string().min(1).max(500)).max(6),
   improvements: z.array(z.string().min(1).max(500)).max(6),
+  frenchExamples: z
+    .array(
+      z.strictObject({
+        french: z.string().min(1).max(2000),
+        english: z.string().min(1).max(2000),
+      }),
+    )
+    .max(3)
+    .default([]),
   practice: z
     .strictObject({
       instructionFrench: z.string().min(1).max(2000),

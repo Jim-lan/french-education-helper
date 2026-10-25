@@ -25,7 +25,7 @@ Validation performed October 25, 2026, after the owner approved the implementati
 
 | Check | Result |
 | --- | --- |
-| `npm test` | 83 tests passed in 14 files; no live API usage |
+| `npm test` | 89 tests passed in 15 files; no live API usage |
 | `npm run typecheck` | Passed |
 | `npm run build` | Passed |
 | Docker image build | Passed with Node.js 24 |
@@ -97,6 +97,23 @@ Local host checks ran on the Mac's installed Node.js 25.4.0. The project targets
   defaults/large bounds. The default now uses a model with a successful structured
   response; wire schemas omit unsupported constraints while Zod retains strict local
   bounds and business validation.
+
+## Audio throughout the learning workflow
+
+Shared audio extension: tests cover individual words, sentences, and complete
+text for an answer, quiz-style prompt, generated sample, and enhanced sentence.
+Workflow tests additionally cover live draft previews, practice prompts/answers,
+generated examples, edit updates, and Stop without additional fetch calls. Legacy
+review payloads default to an empty `frenchExamples` array; malformed samples are
+rejected. The quiz-style test exercises the reusable renderer, not a quiz game.
+
+The rebuilt production container was tested with a synthetic note and a live
+Gemini review. Browser playback started for the homepage example, answer words and
+sentences, two generated French examples, the customized practice question, and
+practice-answer words, sentences, and full text. The shared Stop control stopped
+playback; completed playback dismissed the floating player. At 390px, the document
+width remained 390px with no horizontal overflow. These checks verify browser
+events and controls; physical-device audible playback remains an owner check.
 
 ## Remaining acceptance checks
 

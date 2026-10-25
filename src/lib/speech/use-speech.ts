@@ -45,6 +45,7 @@ export function useSpeech() {
   }, []);
   const stop = useCallback(() => {
     provider.current?.stop();
+    setError("");
     setSpeaking(false);
     setCurrentText("");
     setStarted(false);

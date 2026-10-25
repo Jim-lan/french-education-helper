@@ -1206,3 +1206,106 @@ textarea::placeholder {
     padding: 16px;
   }
 }
+
+.french-audio-text {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border: 1px solid #dce5d3;
+  border-radius: 10px;
+  background: #f6f9f0;
+}
+.audio-text-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.audio-text-heading > strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+.audio-text-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.audio-text-actions .secondary-button {
+  font-size: 11px;
+  padding: 9px 12px;
+  gap: 8px;
+}
+.audio-text-actions svg {
+  width: 16px;
+  height: 16px;
+}
+.french-audio-text .french-source {
+  font-size: 21px;
+  margin: 12px 0 0;
+  line-height: 2.2;
+}
+.french-examples > div {
+  margin-top: 14px;
+}
+.speech-player {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: min(600px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: space-between;
+  background: #183f37;
+  color: #fff;
+  border: 1px solid #507460;
+  border-radius: 12px;
+  padding: 12px 18px;
+  box-shadow: 0 5px 24px #183f3733;
+}
+.speech-player p {
+  font-size: 12px;
+  line-height: 1.6;
+  max-height: 78px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.speech-player .text-button {
+  color: #fff;
+  flex-shrink: 0;
+}
+@media (max-width: 540px) {
+  .french-audio-text {
+    padding: 14px;
+  }
+  .audio-text-heading {
+    gap: 6px;
+  }
+  .speech-player {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .speech-player .text-button {
+    font-size: 11px;
+    max-width: 100px;
+  }
+  .speech-player p {
+    font-size: 11px;
+  }
+}
+.example-card > div {
+  min-width: 0;
+  flex: 1;
+}
+.example-card .french-audio-text {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 12px 0;
+}
+.example-card .french-source {
+  font-size: 18px;
+}

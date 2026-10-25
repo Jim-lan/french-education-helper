@@ -7,6 +7,8 @@ import {
 import { HomeworkResults } from "./HomeworkResults";
 import { OriginalDocument } from "./OriginalDocument";
 import { ArrowIcon, UploadIcon } from "./Icons";
+import { Pronunciation } from "./Pronunciation";
+import { FrenchAudioText } from "./FrenchAudioText";
 const example = "Écris trois phrases avec le mot « ballon ».";
 
 export function HomeworkHelper() {
@@ -291,27 +293,32 @@ export function HomeworkHelper() {
         </div>
       ) : (
         !loading && (
-          <section className="example-card" aria-labelledby="example-heading">
-            <div>
-              <span className="eyebrow">A SMALL EXAMPLE</span>
-              <h2 id="example-heading" lang="fr-CA">
-                {example}
-              </h2>
-              <p>“Write three sentences using the word ‘ballon.’”</p>
-            </div>
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={() => {
-                setMode("text");
-                setText(example);
-                clearResult();
-                textarea.current?.focus();
-              }}
-            >
-              Try this note <ArrowIcon />
-            </button>
-          </section>
+          <Pronunciation>
+            <section className="example-card" aria-labelledby="example-heading">
+              <div>
+                <span className="eyebrow">A SMALL EXAMPLE</span>
+                <h2 id="example-heading">Try a short French note</h2>
+                <FrenchAudioText
+                  text={example}
+                  label="Example French note"
+                  readLabel="Read this example note in French"
+                />
+                <p>“Write three sentences using the word ‘ballon.’”</p>
+              </div>
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => {
+                  setMode("text");
+                  setText(example);
+                  clearResult();
+                  textarea.current?.focus();
+                }}
+              >
+                Try this note <ArrowIcon />
+              </button>
+            </section>
+          </Pronunciation>
         )
       )}
     </>

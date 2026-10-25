@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { ReviewResponseSchema, type AnswerReview } from "@/lib/homework/review";
-import { FrenchPassage } from "./FrenchPassage";
+import { FrenchAudioText } from "./FrenchAudioText";
 
 function Feedback({ review }: { review: AnswerReview }) {
   return (
-    <div className={`answer-feedback ${review.status}`} role="status">
+    <div className={`answer-feedback ${review.status}`}>
       <h4>
         {review.status === "passed"
           ? "Nice work — task complete!"
@@ -13,7 +13,7 @@ function Feedback({ review }: { review: AnswerReview }) {
             ? "A little more practice"
             : "Let's check with a parent"}
       </h4>
-      <p>{review.summaryEnglish}</p>
+      <p role="status">{review.summaryEnglish}</p>
       {review.requirements.length > 0 && (
         <ul className="requirements">
           {review.requirements.map((item, index) => (
@@ -50,6 +50,24 @@ function Feedback({ review }: { review: AnswerReview }) {
             ))}
           </ul>
         </>
+      )}
+      {review.frenchExamples?.length > 0 && (
+        <section
+          className="french-examples"
+          aria-label="French examples to learn from"
+        >
+          <h5>Examples to learn from</h5>
+          {review.frenchExamples.map((example, index) => (
+            <div key={index}>
+              <FrenchAudioText
+                text={example.french}
+                label={`French example ${index + 1}`}
+                readLabel="Read this example in French"
+              />
+              <p>{example.english}</p>
+            </div>
+          ))}
+        </section>
       )}
     </div>
   );
@@ -140,6 +158,19 @@ function AnswerAttempt({
             setError("");
           }}
         />
+        <FrenchAudioText
+          text={answer}
+          label={
+            practice
+              ? "Listen to your practice answer"
+              : "Listen to your answer"
+          }
+          readLabel={
+            practice
+              ? "Read my practice answer in French"
+              : "Read my answer in French"
+          }
+        />
         <div className="form-actions">
           <button
             className="primary-button"
@@ -188,7 +219,11 @@ function AnswerAttempt({
         >
           <p className="eyebrow">A SMALL STEP TO HELP YOU IMPROVE</p>
           <h4>Practice just for you</h4>
-          <FrenchPassage text={review.practice.instructionFrench} />
+          <FrenchAudioText
+            text={review.practice.instructionFrench}
+            label="Listen to the practice question"
+            readLabel="Read the practice question in French"
+          />
           <p>{review.practice.instructionEnglish}</p>
           <details className="practice-hint">
             <summary>Need a hint?</summary>

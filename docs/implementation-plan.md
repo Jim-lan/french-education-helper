@@ -10,6 +10,14 @@ recheck of the original answer. Spelling and similar-sound games remain a later
 phase. A practice pass does not pass the original task; editing an answer clears
 its prior result. Ambiguous or non-written tasks require parent review.
 
+Pronunciation coverage extension: answer editors retain their normal text editing
+and display a live pronounceable view beneath them. All French practice prompts,
+practice answers, and structured generated examples use the same `FrenchAudioText`
+component (word, sentence, and whole-text reading). Review responses may contain
+default-empty `frenchExamples: [{ french, english }]`; French examples are kept
+separate from English feedback. A shared floating player exposes Stop/errors across
+the result. Future quiz text must use this renderer; a quiz engine is not yet built.
+
 The owner approved proceeding after the specification, plan, and README were
 committed. This document preserves the approved proposal. See
 [VALIDATION.md](VALIDATION.md) for implemented behavior, verification results,

@@ -5,6 +5,24 @@ import { GeminiProvider } from "@/server/llm/providers/gemini";
 import { passedReview, needsWorkReview, teacherTask } from "./fixtures/review";
 import type { LLMProvider } from "@/server/llm/types";
 describe("homework answer review", () => {
+  it("accepts legacy feedback and validates structured French samples", () => {
+    const { frenchExamples: _examples, ...legacy } = passedReview;
+    expect(AnswerReviewSchema.parse(legacy).frenchExamples).toEqual([]);
+    expect(
+      AnswerReviewSchema.safeParse({
+        ...passedReview,
+        frenchExamples: [{ french: "", english: "A sample" }],
+      }).success,
+    ).toBe(false);
+    expect(
+      AnswerReviewSchema.safeParse({
+        ...passedReview,
+        frenchExamples: [
+          { french: "Le ballon est bleu.", english: "The ball is blue." },
+        ],
+      }).success,
+    ).toBe(true);
+  });
   it.each([
     passedReview,
     needsWorkReview,
@@ -53,18 +71,16 @@ describe("homework answer review", () => {
     });
   });
   it("keeps review transport/schema/prompt inside the Gemini adapter", async () => {
-    const fetcher = vi
-      .fn<typeof fetch>()
-      .mockResolvedValue(
-        Response.json({
-          candidates: [
-            {
-              finishReason: "STOP",
-              content: { parts: [{ text: JSON.stringify(needsWorkReview) }] },
-            },
-          ],
-        }),
-      );
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      Response.json({
+        candidates: [
+          {
+            finishReason: "STOP",
+            content: { parts: [{ text: JSON.stringify(needsWorkReview) }] },
+          },
+        ],
+      }),
+    );
     const provider = new GeminiProvider("test", "synthetic-key", fetcher);
     const result = await provider.reviewAnswer(
       { originalFrench: teacherTask, answer: "J’aime mon ballon." },

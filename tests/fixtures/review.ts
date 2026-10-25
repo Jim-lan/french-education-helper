@@ -12,6 +12,7 @@ export const passedReview: AnswerReview = {
   ],
   strengths: ["You used the required word in each sentence."],
   improvements: [],
+  frenchExamples: [],
   practice: null,
 };
 export const needsWorkReview: AnswerReview = {
@@ -26,6 +27,9 @@ export const needsWorkReview: AnswerReview = {
   ],
   strengths: ["Your first sentence uses ballon."],
   improvements: ["Add two more complete French sentences."],
+  frenchExamples: [
+    { french: "Le ballon est bleu.", english: "The ball is blue." },
+  ],
   practice: {
     instructionFrench: "Écris une phrase avec le mot ballon.",
     instructionEnglish: "Write one sentence using ballon.",

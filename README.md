@@ -110,6 +110,13 @@ is intended for a trusted home network; do not configure internet port forwardin
    does not mark the original homework complete. Editing a checked answer clears
    its previous result.
 
+As you write, **Listen to your answer** shows a pronounceable copy beneath the
+editor. Tap any word, a sentence's speaker, or **Read my answer in French**.
+The same controls apply to practice questions, practice answers, and French
+examples/improved sentences supplied with feedback. Listening never submits or
+grades the answer. A floating French audio player makes Stop and audio errors
+available even when working lower down the page.
+
 For example, a note asking for three sentences with “ballon” is checked for the
 required sentences, vocabulary, and age-appropriate French. Unclear tasks or tasks
 requiring missing material are referred to a parent rather than assigned a pass.
@@ -137,6 +144,14 @@ Speech uses the browser's speech synthesis on demand, independently of the AI.
 No LLM or app-server request is made when tapping a word or sentence, and no audio
 files are generated during analysis. A replaceable `SpeechProvider` interface
 keeps speech separate from the UI and LLM provider.
+
+`FrenchAudioText` is the shared presentation component for French answers, samples,
+and practice prompts; it uses `FrenchPassage` for token/sentence controls and the
+shared `Pronunciation` context. Future quiz prompts, choices, and sample sentences
+must use this renderer for French content. A quiz game engine remains future work.
+Generated French example sentences are returned in the structured `frenchExamples`
+field with their English translations, so they never rely on guessing which parts
+of English feedback are French. Older feedback without this field is supported.
 
 Canadian French (`fr-CA`) is preferred. If unavailable, another French voice is
 used and the app explains the fallback. Install a Canadian French voice in your
