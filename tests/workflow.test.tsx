@@ -6,6 +6,7 @@ import {
   render,
   screen,
   waitFor,
+  act,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HomeworkHelper } from "@/components/HomeworkHelper";
@@ -73,13 +74,23 @@ describe("homework UI with synthetic responses", () => {
     expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({
       text: content.originalFrench,
     });
-    await user.click(screen.getByRole("button", { name: "Hear Lis" }));
+    const lisButtons = screen.getAllByRole("button", { name: "Hear Lis" });
+    expect(lisButtons).toHaveLength(2);
+    await user.click(lisButtons[0]);
+    await user.click(lisButtons[1]);
     await user.click(
       screen.getByRole("button", {
         name: "Hear sentence: Lis le texte deux fois.",
       }),
     );
-    expect(speak).toHaveBeenCalledTimes(2);
+    await user.click(
+      screen.getByRole("button", { name: "Read the whole note in French" }),
+    );
+    expect(speak).toHaveBeenCalledTimes(4);
+    expect(speak.mock.calls[2][0].text).toBe("Lis le texte deux fois.");
+    expect(speak.mock.calls[3][0].text).toBe(content.originalFrench);
+    act(() => { speak.mock.calls[3][0].onstart(); speak.mock.calls[3][0].onend(); });
+    expect(screen.getByText(`Finished French audio: ${content.originalFrench}`)).toBeTruthy();
     expect(speak.mock.calls[0][0]).toMatchObject({
       text: "Lis",
       lang: "fr-CA",

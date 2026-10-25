@@ -7,6 +7,15 @@ import { segmentFrench } from "@/lib/french/segment";
 import { content } from "./fixtures/analysis";
 describe("application response schema", () => {
   it("accepts older responses without meanings, and rejects malformed definitions", () => {
+    expect(
+      AnalysisContentSchema.safeParse({
+        ...content,
+        wordMeanings: Array.from({ length: 501 }, () => ({
+          french: "Lis",
+          english: "read",
+        })),
+      }).success,
+    ).toBe(false);
     const { wordMeanings: _meanings, ...legacy } = content;
     expect(AnalysisContentSchema.parse(legacy).wordMeanings).toEqual([]);
     for (const wordMeanings of [

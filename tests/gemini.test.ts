@@ -21,8 +21,12 @@ describe("Gemini adapter (mocked HTTP only)", () => {
     expect(
       body.generationConfig.responseJsonSchema.properties.originalFrench,
     ).toBeDefined();
-    expect(body.generationConfig.responseJsonSchema.properties.wordMeanings).toBeDefined();
+    expect(
+      body.generationConfig.responseJsonSchema.properties.wordMeanings,
+    ).toBeDefined();
     expect(body.contents[0].parts[0].text).toContain('"Lis","le","texte"');
+    expect(JSON.stringify(body.generationConfig.responseJsonSchema)).not.toContain('"maxItems"');
+    expect(JSON.stringify(body.generationConfig.responseJsonSchema)).not.toContain('"default"');
     expect(init?.signal).toBe(signal);
   });
   it("encodes image bytes inside the adapter", async () => {

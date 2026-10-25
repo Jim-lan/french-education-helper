@@ -8,9 +8,10 @@ a natural English translation and simple instructions, and tap French words or
 sentences to hear them pronounced.
 
 **Status:** V1 implementation is available. Automated tests, production builds,
-Docker startup, and responsive browser checks have passed. Live Gemini analysis
-requires your API key; physical iPad/iPhone and audible speech checks remain to
-be completed. See [validation results](docs/VALIDATION.md).
+Docker startup, and responsive browser checks have passed. Live text analysis
+and answer feedback have been exercised with synthetic homework. Configure your
+API key for a fresh installation; physical iPad/iPhone and audible-device checks
+remain to be completed. See [validation results](docs/VALIDATION.md).
 
 ## Start on your Mac
 
@@ -29,14 +30,14 @@ Install and start Docker Desktop, then open a terminal in this project folder.
 
    ```dotenv
    LLM_PROVIDER=gemini
-   LLM_MODEL=gemini-3.5-flash-lite
+   LLM_MODEL=gemini-3.1-flash-lite
    GEMINI_API_KEY=your-api-key
    ```
 
    Obtain an API key through [Google AI Studio](https://aistudio.google.com/apikey).
    Do not paste your key into chat or commit it to Git. Model availability and
    quotas depend on your provider account. The model is configurable; the default
-   is documented in [Google's model reference](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite).
+   is documented in [Google's model reference](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite).
 
 3. Start the single container:
 
@@ -98,6 +99,22 @@ is intended for a trusted home network; do not configure internet port forwardin
    the full sentence. Repeated words appear once; contractions stay together.
 5. Tap a French word to hear it, or use a speaker to hear the complete sentence.
    **Stop audio** cancels playback.
+   French words in the meanings list are also pronounceable. **Read the whole note
+   in French** reads all instructions. The audio status reports start/completion
+   and explains when a browser cannot start speech.
+6. Write your response under **Your turn**, then choose **Check my answer**.
+   One AI request checks the actual teacher requirements and gives kind, specific
+   Grade 3 feedback. It does not submit while you type.
+7. If revision is needed, try the customized exercise and choose **Check practice
+   answer**, then revise and recheck the original task. Passing a practice exercise
+   does not mark the original homework complete. Editing a checked answer clears
+   its previous result.
+
+For example, a note asking for three sentences with “ballon” is checked for the
+required sentences, vocabulary, and age-appropriate French. Unclear tasks or tasks
+requiring missing material are referred to a parent rather than assigned a pass.
+Feedback is an AI suggestion for practice, not a teacher's grade. Spelling and
+similar-sound games remain the next phase after the basic homework workflow.
 
 Word meanings are generated as part of the original analysis, with no extra API
 request when expanding the section or tapping words. They reflect the note's
@@ -126,6 +143,9 @@ used and the app explains the fallback. Install a Canadian French voice in your
 device's speech/accessibility settings if necessary. Voice availability, audible
 output, and whether a system voice uses an online service depend on the device.
 Browsers without speech support show a message while text results remain usable.
+All French controls within a result share one speech instance. A paused engine is
+resumed on the next tap, and a six-second startup watchdog exposes silent failures.
+See the browser's [paused speech behavior](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/paused).
 
 ## Limits and privacy
 
@@ -218,6 +238,12 @@ normalization, so pasted French is preserved exactly. Both input paths return
 `{ ok: true, data: HomeworkAnalysis }`, or a safe `{ ok: false, error: { code,
 message } }` with an HTTP error status. The model returns structured data, never
 application HTML. Word/sentence segmentation is deterministic application logic.
+
+`POST /api/review` accepts JSON `{ originalFrench, answer }`. The provider returns
+validated requirements, strengths, improvements, and one targeted practice task
+when needed. Review states are `passed`, `needs_work`, or `needs_parent_review`.
+Passing requires all reported teacher requirements to be met. Both API routes
+share process-local limits and keep credentials/server prompts out of browser code.
 
 ## Project documents and scope
 

@@ -9,6 +9,9 @@ export function useSpeech() {
   const [speaking, setSpeaking] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [currentText, setCurrentText] = useState("");
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState("");
   useEffect(() => {
     if (
       !("speechSynthesis" in window) ||
@@ -43,15 +46,25 @@ export function useSpeech() {
   const stop = useCallback(() => {
     provider.current?.stop();
     setSpeaking(false);
+    setCurrentText("");
+    setStarted(false);
+    setFinished("");
   }, []);
   const speak = useCallback((text: string) => {
     if (!provider.current) return;
     setError("");
     setSpeaking(true);
+    setCurrentText(text);
+    setStarted(false);
+    setFinished("");
     try {
       provider.current.speak(text, {
         locale: "fr-CA",
-        onEnd: () => setSpeaking(false),
+        onStart: () => setStarted(true),
+        onEnd: () => {
+          setSpeaking(false);
+          setFinished(text);
+        },
         onError: (message) => {
           setError(message);
           setSpeaking(false);
@@ -62,5 +75,15 @@ export function useSpeech() {
       setError("Pronunciation couldn't start. Please try again.");
     }
   }, []);
-  return { speak, stop, supported, speaking, notice, error };
+  return {
+    speak,
+    stop,
+    supported,
+    speaking,
+    notice,
+    error,
+    currentText,
+    started,
+    finished,
+  };
 }

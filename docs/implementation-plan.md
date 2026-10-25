@@ -2,6 +2,14 @@
 
 Status: **approved by the project owner on October 25, 2026; implementation in progress**.
 
+Current priority, requested October 25: mandatory French pronunciation for every
+word (including glossary entries) and each sentence; then complete the teacher's
+actual written task before expansion. The answer workflow now uses an explicit
+review request, validated feedback, a targeted practice task when needed, and a
+recheck of the original answer. Spelling and similar-sound games remain a later
+phase. A practice pass does not pass the original task; editing an answer clears
+its prior result. Ambiguous or non-written tasks require parent review.
+
 The owner approved proceeding after the specification, plan, and README were
 committed. This document preserves the approved proposal. See
 [VALIDATION.md](VALIDATION.md) for implemented behavior, verification results,

@@ -4,7 +4,7 @@ import { readLimitedBody } from "../http";
 import type { HomeworkInput } from "../llm/types";
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 export const MAX_BODY_BYTES = 12 * 1024 * 1024;
-async function readUpload(request: Request, limit: number) {
+export async function readUpload(request: Request, limit: number) {
   if (Number(request.headers.get("content-length")) > limit)
     throw new AppError(
       "INPUT_TOO_LARGE",

@@ -14,7 +14,8 @@ Validation performed October 25, 2026, after the owner approved the implementati
 - Application-owned Zod validation and deterministic French sentence/word segmentation.
 - Server-only Gemini adapter behind `LLMProvider`, with configurable provider/model.
 - Independent `SpeechProvider` and browser speech synthesis, preferring fr-CA.
-- Word and sentence controls, Stop audio, asynchronous voice loading, and fallback messaging.
+- Word and sentence controls in the original text and meanings list, whole-note reading,
+  shared Stop audio, asynchronous voice loading, pause recovery, and silent-start detection.
 - Bounded request/response bodies, upload/provider timeouts, cancellation, input validation,
   process-local concurrency/rate limits, same-origin browser request checks, and safe errors.
 - Single-container Docker Compose deployment, non-root Node.js 24 runtime, health check,
@@ -24,7 +25,7 @@ Validation performed October 25, 2026, after the owner approved the implementati
 
 | Check | Result |
 | --- | --- |
-| `npm test` | 65 tests passed in 11 files; no live API usage |
+| `npm test` | 83 tests passed in 14 files; no live API usage |
 | `npm run typecheck` | Passed |
 | `npm run build` | Passed |
 | Docker image build | Passed with Node.js 24 |
@@ -72,16 +73,40 @@ Local host checks ran on the Mac's installed Node.js 25.4.0. The project targets
 - Word-meaning enhancement: inspected the contextual glossary in the desktop results,
   verified native expand/collapse controls, and confirmed no overflow at 390px.
 
+## Pronunciation and homework-answer update
+
+- Both the original French and glossary words now use shared, working audio controls.
+- Added explicit whole-note reading alongside each sentence speaker and word buttons.
+- Browser speech was tested against live analysis: the browser emitted start and
+  finish events for `ballon` in both the original text and glossary, and for the
+  complete teacher instruction. This verifies
+  the browser engine; audible sound on the owner's device still needs confirmation.
+- Paused synthesis is resumed, stale utterance callbacks are ignored, and a six-second
+  startup timeout surfaces a browser that fails silently. All controls stay independent
+  of LLM calls.
+- Live text analysis, incomplete-answer review with customized practice, and a correct
+  three-sentence answer all succeeded through the production app. The incomplete answer
+  was flagged as one sentence out of three; the revised answer passed both requirements.
+- Added `/api/review`, application-owned review schemas, provider review capability,
+  an answer form, per-requirement feedback, and targeted practice. The original task
+  must pass separately; editing resets its result. Ambiguous tasks request parent review.
+- Unit/DOM/API tests verify incomplete/correct review states, practice without premature
+  completion, state reset after edits, safe errors, answer retention, and no automatic
+  request while typing.
+- Live provider diagnostics found model availability restrictions and rejected schema
+  defaults/large bounds. The default now uses a model with a successful structured
+  response; wire schemas omit unsupported constraints while Zod retains strict local
+  bounds and business validation.
+
 ## Remaining acceptance checks
 
-These have not been performed and are required before declaring the full V1 definition
+The outstanding items below are required before declaring the full V1 definition
 of done in PROJECT_SPEC.md Section 33 complete:
 
-1. Configure a real Gemini API key in the ignored `.env.local` file and recreate the
-   container. No key was supplied during implementation.
-2. Analyze a synthetic French note and a synthetic note image through the live Gemini
-   API. Confirm the configured model is available to the owner's account and the
-   translation/explanation are useful.
+1. Analyze a synthetic note image through the live Gemini API. Text analysis has
+   already succeeded with the configured key; image transport is covered by mocks.
+2. Verify audible French on the owner's device. The browser has emitted actual
+   start/finish events for original words, glossary words, and the full sentence.
 3. Try an actual homework photo without adding it to Git. Compare the transcription,
    uncertainty warnings, English, and instructions with the original document.
 4. On a physical iPad/iPhone or another home Wi-Fi device, open the Mac's local address

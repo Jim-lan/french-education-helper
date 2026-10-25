@@ -17,7 +17,7 @@ export function readConfig(
       "Gemini is selected but has not been configured. Ask a parent to add GEMINI_API_KEY to .env.local and restart the app.",
       503,
     );
-  const model = (env.LLM_MODEL || "gemini-3.5-flash-lite").trim();
+  const model = (env.LLM_MODEL || "gemini-3.1-flash-lite").trim();
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,100}$/.test(model))
     throw new AppError(
       "INVALID_CONFIGURATION",

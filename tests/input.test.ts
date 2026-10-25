@@ -24,13 +24,20 @@ describe("input validation", () => {
     try {
       const stream = new ReadableStream<Uint8Array>();
       const req = new Request("http://localhost/api/analyze", {
-        method: "POST", body: stream, duplex: "half",
+        method: "POST",
+        body: stream,
+        duplex: "half",
         headers: { "Content-Type": "application/json" },
       } as RequestInit);
-      const assertion = expect(parseInput(req)).rejects.toHaveProperty("name", "AbortError");
+      const assertion = expect(parseInput(req)).rejects.toHaveProperty(
+        "name",
+        "AbortError",
+      );
       await vi.advanceTimersByTimeAsync(15001);
       await assertion;
-    } finally { vi.useRealTimers(); }
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it("preserves text exactly", async () => {
     const text = "  À l'école.\nLis ceci.  ";

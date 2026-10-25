@@ -1,6 +1,7 @@
 export interface SpeechOptions {
   locale?: string;
   rate?: number;
+  onStart?: () => void;
   onEnd?: () => void;
   onError?: (message: string) => void;
 }

@@ -6,7 +6,13 @@ import {
 } from "@/lib/homework/schema";
 import { AppError } from "@/server/errors";
 import { readLimitedBody } from "@/server/http";
-import { HOMEWORK_PROMPT } from "../prompt";
+import { HOMEWORK_PROMPT, ANSWER_REVIEW_PROMPT } from "../prompt";
+import {
+  ReviewContentSchema,
+  AnswerReviewSchema,
+  type ReviewInput,
+  type AnswerReview,
+} from "@/lib/homework/review";
 import type { LLMProvider, HomeworkInput } from "../types";
 import { getWordGlossary } from "@/lib/french/meanings";
 const WireSchema = AnalysisContentSchema.extend({
@@ -17,7 +23,19 @@ function providerSchema(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   return Object.fromEntries(
     Object.entries(value)
-      .filter(([key]) => !["$schema", "minLength", "maxLength"].includes(key))
+      // Large bounds/defaults can make Gemini reject an otherwise valid schema.
+      // Application-side Zod validation still enforces every bound after decoding.
+      .filter(
+        ([key]) =>
+          ![
+            "$schema",
+            "minLength",
+            "maxLength",
+            "default",
+            "maxItems",
+            "minItems",
+          ].includes(key),
+      )
       .map(([key, item]) => [key, providerSchema(item)]),
   );
 }
@@ -72,6 +90,47 @@ export class GeminiProvider implements LLMProvider {
               },
             },
           ];
+    const raw = await this.generate(parts, HOMEWORK_PROMPT, WireSchema, signal);
+    const parsed = WireSchema.safeParse(raw);
+    if (!parsed.success)
+      throw new AppError(
+        "INVALID_AI_RESPONSE",
+        "The AI couldn't return a complete explanation. Please try again.",
+        502,
+      );
+    const content = parsed.data;
+    if (!content.originalFrench.trim())
+      throw new AppError(
+        "UNREADABLE_INPUT",
+        "I couldn't find readable French in this note. Try clearer text or a sharper picture.",
+      );
+    return AnalysisContentSchema.parse(content);
+  }
+  async reviewAnswer(
+    input: ReviewInput,
+    { signal }: { signal: AbortSignal },
+  ): Promise<AnswerReview> {
+    const raw = await this.generate(
+      [{ text: JSON.stringify(input) }],
+      ANSWER_REVIEW_PROMPT,
+      ReviewContentSchema,
+      signal,
+    );
+    const result = AnswerReviewSchema.safeParse(raw);
+    if (!result.success)
+      throw new AppError(
+        "INVALID_AI_RESPONSE",
+        "The feedback was incomplete. Please check your answer again.",
+        502,
+      );
+    return result.data;
+  }
+  private async generate(
+    parts: unknown[],
+    prompt: string,
+    schema: z.ZodType,
+    signal: AbortSignal,
+  ): Promise<unknown> {
     const response = await this.fetcher(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent`,
       {
@@ -83,11 +142,14 @@ export class GeminiProvider implements LLMProvider {
           "x-goog-api-key": this.apiKey,
         },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: HOMEWORK_PROMPT }] },
+          systemInstruction: { parts: [{ text: prompt }] },
           contents: [{ role: "user", parts }],
           generationConfig: {
+            ...(this.model === "gemini-3.8-flash"
+              ? { thinkingConfig: { thinkingLevel: "LOW" } }
+              : {}),
             responseMimeType: "application/json",
-            responseJsonSchema: providerSchema(z.toJSONSchema(WireSchema)),
+            responseJsonSchema: providerSchema(z.toJSONSchema(schema)),
             maxOutputTokens: 12000,
           },
         }),
@@ -141,13 +203,7 @@ export class GeminiProvider implements LLMProvider {
           .filter((part) => !part.thought)
           .map((part) => part.text || "")
           .join("") || "";
-      const content = WireSchema.parse(JSON.parse(text));
-      if (!content.originalFrench.trim())
-        throw new AppError(
-          "UNREADABLE_INPUT",
-          "I couldn't find readable French in this note. Try clearer text or a sharper picture.",
-        );
-      return AnalysisContentSchema.parse(content);
+      return JSON.parse(text);
     } catch (error) {
       if (error instanceof AppError) throw error;
       throw new AppError(

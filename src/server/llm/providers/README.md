@@ -24,4 +24,4 @@ different provider ID. No fake provider is available through production configur
 
 References: [Gemini REST API](https://ai.google.dev/api/generate-content),
 [structured output](https://ai.google.dev/gemini-api/docs/structured-output),
-[configured default model](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite).
+[configured default model](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite).

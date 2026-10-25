@@ -1071,3 +1071,138 @@ textarea::placeholder {
   margin-top: 12px;
   line-height: 1.7;
 }
+
+.read-french {
+  margin-top: 14px;
+}
+.word-meaning-row .french-word {
+  font-size: 19px;
+  text-align: left;
+}
+.answer-workspace {
+  margin: 25px 0 18px;
+  padding: 26px 28px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.answer-workspace h3 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: 28px;
+  margin: 7px 0 12px;
+}
+.answer-attempt form {
+  margin-top: 22px;
+}
+.answer-attempt label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.answer-attempt .form-actions {
+  margin-top: 16px;
+}
+.answer-feedback {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #cfdec6;
+  border-radius: 10px;
+  background: #f1f7eb;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.answer-feedback.needs_work {
+  background: #fff7e6;
+  border-color: #e8d5a9;
+}
+.answer-feedback.needs_parent_review {
+  background: #f3f4f8;
+  border-color: #d9dce6;
+}
+.answer-feedback h4,
+.targeted-practice h4 {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 12px;
+}
+.answer-feedback h5 {
+  font-size: 13px;
+  margin: 16px 0 7px;
+}
+.answer-feedback ul {
+  padding-left: 22px;
+  margin: 6px 0;
+}
+.answer-feedback .requirements {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+.requirements li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 12px;
+}
+.requirements p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.requirement-met,
+.requirement-missed {
+  font-size: 10px;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: #e0edd5;
+  color: #49683d;
+}
+.requirement-missed {
+  background: #f1dfb4;
+  color: #806023;
+}
+.targeted-practice {
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+.targeted-practice h4 {
+  margin-top: 7px;
+}
+.targeted-practice > p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.practice-hint {
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 14px;
+}
+.practice-hint summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 10px 0;
+}
+.completion-message {
+  font-size: 13px;
+  line-height: 1.8;
+  background: #edf4e7;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 14px;
+}
+@media (max-width: 540px) {
+  .answer-workspace {
+    padding: 22px 18px;
+  }
+  .requirements li {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .answer-feedback {
+    padding: 16px;
+  }
+}

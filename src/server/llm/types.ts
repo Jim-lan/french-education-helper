@@ -1,5 +1,6 @@
 import "server-only";
 import type { AnalysisContent } from "@/types/homework";
+import type { ReviewInput, AnswerReview } from "@/lib/homework/review";
 export type ProviderId = "gemini" | "openai" | "xai";
 export type HomeworkInput =
   | { kind: "text"; text: string }
@@ -16,4 +17,8 @@ export interface LLMProvider {
     input: HomeworkInput,
     options: { signal: AbortSignal },
   ): Promise<AnalysisContent>;
+  reviewAnswer?(
+    input: ReviewInput,
+    options: { signal: AbortSignal },
+  ): Promise<AnswerReview>;
 }

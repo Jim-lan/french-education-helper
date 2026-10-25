@@ -1,8 +1,12 @@
+"use client";
 import { getWordGlossary } from "@/lib/french/meanings";
 import type { HomeworkAnalysis } from "@/types/homework";
+import { FrenchWord } from "./FrenchWord";
+import { usePronunciation } from "./Pronunciation";
 
 export function WordMeanings({ analysis }: { analysis: HomeworkAnalysis }) {
   const words = getWordGlossary(analysis.originalFrench, analysis.wordMeanings);
+  const speech = usePronunciation();
   if (!words.length) return null;
   return (
     <details className="word-meanings" open>
@@ -14,7 +18,7 @@ export function WordMeanings({ analysis }: { analysis: HomeworkAnalysis }) {
       </summary>
       <p className="panel-caption">
         Short meanings for this note. A word can mean something different in
-        another sentence.
+        another sentence. Tap a French word here to hear it too.
       </p>
       {!analysis.wordMeanings.length && (
         <p className="meaning-note">
@@ -24,7 +28,13 @@ export function WordMeanings({ analysis }: { analysis: HomeworkAnalysis }) {
       <dl className="word-meanings-list">
         {words.map((word, index) => (
           <div className="word-meaning-row" key={index}>
-            <dt lang="fr-CA">{word.french}</dt>
+            <dt lang="fr-CA">
+              <FrenchWord
+                text={word.french}
+                disabled={!speech.supported}
+                onHear={speech.speak}
+              />
+            </dt>
             <dd>
               {word.english ?? (
                 <span className="meaning-unavailable">Not available</span>
