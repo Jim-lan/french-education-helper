@@ -1,6 +1,12 @@
 import { z } from "zod";
 
 export const AnalysisContentSchema = z.strictObject({
+  isFrenchStudy: z.boolean().default(true),
+  relevanceExplanation: z
+    .string()
+    .min(1)
+    .max(1000)
+    .default("French learning material."),
   originalFrench: z.string().min(1).max(30000),
   englishTranslation: z.string().min(1).max(30000),
   studentExplanation: z.string().min(1).max(10000),
@@ -60,7 +66,11 @@ export const HomeworkAnalysisSchema = AnalysisContentSchema.extend({
 export type AnalysisContent = z.infer<typeof AnalysisContentSchema>;
 export type HomeworkAnalysis = z.infer<typeof HomeworkAnalysisSchema>;
 export const AnalyzeResponseSchema = z.discriminatedUnion("ok", [
-  z.strictObject({ ok: z.literal(true), data: HomeworkAnalysisSchema }),
+  z.strictObject({
+    ok: z.literal(true),
+    data: HomeworkAnalysisSchema,
+    lessonId: z.string().uuid().optional(),
+  }),
   z.strictObject({
     ok: z.literal(false),
     error: z.strictObject({ code: z.string(), message: z.string() }),

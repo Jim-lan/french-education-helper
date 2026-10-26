@@ -53,7 +53,10 @@ export class BrowserSpeechProvider implements SpeechProvider {
       if (sequence === this.sequence) {
         this.clearStartTimer();
         this.utterance = null;
-        if (["interrupted", "canceled"].includes(event.error)) { options.onEnd?.(); return; }
+        if (["interrupted", "canceled"].includes(event.error)) {
+          options.onEnd?.();
+          return;
+        }
         options.onError?.(
           "Pronunciation couldn't play. Check your device's sound and French voice settings, then try again.",
         );
@@ -70,7 +73,11 @@ export class BrowserSpeechProvider implements SpeechProvider {
     try {
       if (this.engine.paused) this.engine.resume();
       this.engine.speak(utterance);
-    } catch (error) { this.clearStartTimer(); this.utterance = null; throw error; }
+    } catch (error) {
+      this.clearStartTimer();
+      this.utterance = null;
+      throw error;
+    }
   }
   stop() {
     this.clearStartTimer();

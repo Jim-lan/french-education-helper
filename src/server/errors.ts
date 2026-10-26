@@ -11,6 +11,17 @@ export class AppError extends Error {
 export function safeError(error: unknown) {
   if (error instanceof AppError) return error;
   if (
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    String(error.code).startsWith("ERR_SQLITE")
+  )
+    return new AppError(
+      "STORAGE_UNAVAILABLE",
+      "Learning history could not be saved or opened. Ask a parent to check the data volume and free disk space.",
+      503,
+    );
+  if (
     error instanceof Error &&
     ["TimeoutError", "AbortError"].includes(error.name)
   )

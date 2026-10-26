@@ -1,5 +1,10 @@
 # French Education Helper — V1 implementation plan
 
+Current extension: saved history, marks, redo, spelling/sound games and monthly
+summary quizzes are now authorized in [learning-history-plan.md](learning-history-plan.md).
+This supersedes the original no-retention / no-quiz scope below; the original
+proposal is retained as a design record.
+
 Status: **approved by the project owner on October 25, 2026; implementation in progress**.
 
 Current priority, requested October 25: mandatory French pronunciation for every
@@ -367,19 +372,19 @@ Section 33's complete scenario before calling V1 done.
 
 ## 7. Ambiguities and architectural risks
 
-| Topic | Proposed resolution | Timing |
-| --- | --- | --- |
-| Actual image is authoritative | Keep image alongside AI interpretation; extracted text is explicitly labeled | Required architecture; included in plan |
-| HEIC practicality | JPEG/PNG/WebP first; helpful HEIC rejection, conversion deferred | Approve default with plan |
-| Exact Gemini model and quotas | Use LLM_MODEL; verify a suitable available multimodal model during Phase 1; do not promise free usage | Model/key needed for live checks, not planning |
-| fr-CA voice availability | Prefer fr-CA, disclose fallback; user-installed device voices determine availability | Test in Phase 2; cloud TTS deferred |
-| Handwriting/layout/circled content | Preserve readable content, surface warnings, avoid invented reconstruction; no pixel-accurate worksheet recreation | Core design now; refine with examples later |
-| Mixed French/English text | Preserve pasted source exactly; translate/explain relevant French and warn if needed; do not lose context silently | Core prompt/validation design |
-| Prompt injection and invalid output | Treat source as data, enforce runtime schemas, escape rendering, bound inputs/time/output | Required before accepting inputs |
-| Source lifetime | Browser memory and request memory only; no localStorage/history/database; reset/reload clears note | Required architecture; included in plan |
-| Model field names vs previous drafts | Approved application schema replaces draft names; update existing types in Phase 0 | Approval now; code changes later |
-| Future online deployment | Keep Node/container app portable; authentication/privacy/access controls become a separate milestone | Deferred |
-| Large uploads/provider cost | Stream body-size enforcement, bounded concurrency, timeout and modest process-local rate limit; no paid automated tests | Implement with API, without extra infrastructure |
+| Topic                                | Proposed resolution                                                                                                     | Timing                                           |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Actual image is authoritative        | Keep image alongside AI interpretation; extracted text is explicitly labeled                                            | Required architecture; included in plan          |
+| HEIC practicality                    | JPEG/PNG/WebP first; helpful HEIC rejection, conversion deferred                                                        | Approve default with plan                        |
+| Exact Gemini model and quotas        | Use LLM_MODEL; verify a suitable available multimodal model during Phase 1; do not promise free usage                   | Model/key needed for live checks, not planning   |
+| fr-CA voice availability             | Prefer fr-CA, disclose fallback; user-installed device voices determine availability                                    | Test in Phase 2; cloud TTS deferred              |
+| Handwriting/layout/circled content   | Preserve readable content, surface warnings, avoid invented reconstruction; no pixel-accurate worksheet recreation      | Core design now; refine with examples later      |
+| Mixed French/English text            | Preserve pasted source exactly; translate/explain relevant French and warn if needed; do not lose context silently      | Core prompt/validation design                    |
+| Prompt injection and invalid output  | Treat source as data, enforce runtime schemas, escape rendering, bound inputs/time/output                               | Required before accepting inputs                 |
+| Source lifetime                      | Browser memory and request memory only; no localStorage/history/database; reset/reload clears note                      | Required architecture; included in plan          |
+| Model field names vs previous drafts | Approved application schema replaces draft names; update existing types in Phase 0                                      | Approval now; code changes later                 |
+| Future online deployment             | Keep Node/container app portable; authentication/privacy/access controls become a separate milestone                    | Deferred                                         |
+| Large uploads/provider cost          | Stream body-size enforcement, bounded concurrency, timeout and modest process-local rate limit; no paid automated tests | Implement with API, without extra infrastructure |
 
 ## 8. Decisions required now versus later
 

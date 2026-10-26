@@ -1,24 +1,11 @@
 import { HomeworkHelper } from "@/components/HomeworkHelper";
-import { BookIcon, SpeakerIcon } from "@/components/Icons";
+import { SpeakerIcon } from "@/components/Icons";
 export default function HomePage() {
   return (
     <>
       <a className="skip-link" href="#homework">
         Skip to homework
       </a>
-      <header className="site-header">
-        <a className="brand" href="/" aria-label="French Education Helper home">
-          <span className="brand-mark">
-            <BookIcon />
-          </span>
-          <span>
-            French Education <strong>Helper</strong>
-          </span>
-        </a>
-        <span className="header-tag">
-          <span className="status-dot" /> Made for learning together
-        </span>
-      </header>
       <main id="homework">
         <section className="hero">
           <div className="hero-copy">

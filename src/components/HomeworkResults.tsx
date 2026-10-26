@@ -4,12 +4,19 @@ import { FrenchText } from "./FrenchText";
 import { WordMeanings } from "./WordMeanings";
 import { Pronunciation } from "./Pronunciation";
 import { AnswerWorkspace } from "./AnswerWorkspace";
+import type { StudyAttempt } from "@/lib/learning/types";
 export function HomeworkResults({
   analysis,
   onCorrect,
+  lessonId,
+  attempts,
+  onSaved,
 }: {
   analysis: HomeworkAnalysis;
   onCorrect: () => void;
+  lessonId?: string;
+  attempts?: StudyAttempt[];
+  onSaved?: () => void;
 }) {
   return (
     <Pronunciation>
@@ -79,7 +86,12 @@ export function HomeworkResults({
             )}
           </div>
         </article>
-        <AnswerWorkspace originalFrench={analysis.originalFrench} />
+        <AnswerWorkspace
+          originalFrench={analysis.originalFrench}
+          lessonId={lessonId}
+          attempts={attempts}
+          onSaved={onSaved}
+        />
         <p className="muted small">
           AI can make mistakes. Check the original note if something looks
           surprising.

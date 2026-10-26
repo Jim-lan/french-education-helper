@@ -11,6 +11,10 @@ export const ReviewRequestSchema = z.strictObject({
     .max(10000)
     .refine((text) => Boolean(text.trim())),
 });
+export const ReviewSubmissionSchema = ReviewRequestSchema.extend({
+  lessonId: z.string().uuid().optional(),
+  parentAttemptId: z.string().uuid().optional(),
+}).refine((input) => !input.parentAttemptId || Boolean(input.lessonId));
 export const ReviewContentSchema = z.strictObject({
   status: z.enum(["passed", "needs_work", "needs_parent_review"]),
   summaryEnglish: z.string().min(1).max(2000),
@@ -65,7 +69,11 @@ export const AnswerReviewSchema = ReviewContentSchema.superRefine(
   },
 );
 export const ReviewResponseSchema = z.discriminatedUnion("ok", [
-  z.strictObject({ ok: z.literal(true), data: AnswerReviewSchema }),
+  z.strictObject({
+    ok: z.literal(true),
+    data: AnswerReviewSchema,
+    attemptId: z.string().uuid().optional(),
+  }),
   z.strictObject({
     ok: z.literal(false),
     error: z.strictObject({ code: z.string(), message: z.string() }),

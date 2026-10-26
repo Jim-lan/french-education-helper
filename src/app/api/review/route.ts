@@ -1,9 +1,10 @@
-import { ReviewRequestSchema } from "@/lib/homework/review";
+import { ReviewSubmissionSchema } from "@/lib/homework/review";
 import { readUpload } from "@/server/homework/input";
 import { reviewAnswer } from "@/server/homework/review";
 import { requestLimiter } from "@/server/homework/limits";
 import { createProvider } from "@/server/llm/provider-factory";
 import { AppError, safeError } from "@/server/errors";
+import { getStore } from "@/server/learning/store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
         "Your answer could not be read. Please try again.",
       );
     }
-    const input = ReviewRequestSchema.safeParse(raw);
+    const input = ReviewSubmissionSchema.safeParse(raw);
     if (!input.success)
       throw new AppError(
         "INVALID_INPUT",
@@ -52,10 +53,35 @@ export async function POST(request: Request) {
       request.signal,
       AbortSignal.timeout(60000),
     ]);
+    const stored = input.data.lessonId
+      ? getStore().getTask(input.data.lessonId, input.data.parentAttemptId)
+      : null;
+    if (stored && input.data.originalFrench !== stored.task)
+      throw new AppError(
+        "INVALID_INPUT",
+        "The saved task has changed. Reopen it from history.",
+      );
+    const data = await reviewAnswer(
+      {
+        originalFrench: stored?.task || input.data.originalFrench,
+        answer: input.data.answer,
+      },
+      createProvider(),
+      signal,
+    );
+    const attempt = input.data.lessonId
+      ? getStore().saveAttempt(
+          input.data.lessonId,
+          input.data.answer,
+          data,
+          input.data.parentAttemptId,
+        )
+      : null;
     return Response.json(
       {
         ok: true,
-        data: await reviewAnswer(input.data, createProvider(), signal),
+        data,
+        ...(attempt ? { attemptId: attempt.id } : {}),
       },
       { headers },
     );

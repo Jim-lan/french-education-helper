@@ -1,6 +1,7 @@
 import "server-only";
 import type { AnalysisContent } from "@/types/homework";
 import type { ReviewInput, AnswerReview } from "@/lib/homework/review";
+import type { LearningContext, QuizPack } from "@/lib/learning/quiz";
 export type ProviderId = "gemini" | "openai" | "xai";
 export type HomeworkInput =
   | { kind: "text"; text: string }
@@ -21,4 +22,8 @@ export interface LLMProvider {
     input: ReviewInput,
     options: { signal: AbortSignal },
   ): Promise<AnswerReview>;
+  generateQuiz?(
+    input: LearningContext,
+    options: { signal: AbortSignal },
+  ): Promise<QuizPack>;
 }

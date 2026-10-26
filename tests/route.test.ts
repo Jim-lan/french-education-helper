@@ -4,6 +4,11 @@ import { createProvider } from "@/server/llm/provider-factory";
 import { AppError } from "@/server/errors";
 import { content } from "./fixtures/analysis";
 vi.mock("@/server/llm/provider-factory", () => ({ createProvider: vi.fn() }));
+vi.mock("@/server/learning/store", () => ({
+  getStore: () => ({
+    saveLesson: () => ({ id: "00000000-0000-4000-8000-000000000001" }),
+  }),
+}));
 afterEach(() => vi.resetAllMocks());
 function request(origin = "http://localhost") {
   return new Request("http://localhost/api/analyze", {

@@ -1,4 +1,6 @@
 export const content = {
+  isFrenchStudy: true,
+  relevanceExplanation: "French learning material.",
   originalFrench: "Lis le texte deux fois. Souligne les verbes.",
   englishTranslation: "Read the text twice. Underline the verbs.",
   studentExplanation:

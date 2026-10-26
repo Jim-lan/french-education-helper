@@ -19,6 +19,13 @@ To add a provider:
 3. Register configuration and construction in `server/config.ts` and the factory.
 4. Add mocked transport/normalization tests. UI and service components stay unchanged.
 
+Analysis also classifies French-study relevance (`isFrenchStudy` and
+`relevanceExplanation`); rejected source material must not be saved. Optional
+provider operations `reviewAnswer` and `generateQuiz` return application-owned
+`AnswerReview` and `QuizPack` data. Both have runtime validation in their services.
+Monthly scheduling calls the same provider factory. Quiz scoring and browser
+pronunciation are deterministic application operations and never call an adapter.
+
 `tests/analyze.test.ts` verifies the service using a test-only adapter with a
 different provider ID. No fake provider is available through production configuration.
 

@@ -6,4 +6,10 @@ services:
     env_file:
       - path: .env.local
         required: false
+    environment:
+      DATA_DIR: /app/data
+    volumes:
+      - learning_data:/app/data
     restart: unless-stopped
+volumes:
+  learning_data:

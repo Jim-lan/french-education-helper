@@ -3,6 +3,7 @@ import { parseInput } from "@/server/homework/input";
 import { requestLimiter } from "@/server/homework/limits";
 import { createProvider } from "@/server/llm/provider-factory";
 import { AppError, safeError } from "@/server/errors";
+import { getStore } from "@/server/learning/store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
@@ -26,7 +27,8 @@ export async function POST(request: Request) {
       AbortSignal.timeout(60000),
     ]);
     const data = await analyzeHomework(input, createProvider(), signal);
-    return Response.json({ ok: true, data }, { headers });
+    const lesson = getStore().saveLesson(data, input);
+    return Response.json({ ok: true, data, lessonId: lesson.id }, { headers });
   } catch (error) {
     const safe = safeError(error);
     return Response.json(

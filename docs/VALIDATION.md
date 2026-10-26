@@ -23,23 +23,23 @@ Validation performed October 25, 2026, after the owner approved the implementati
 
 ## Automated checks
 
-| Check | Result |
-| --- | --- |
-| `npm test` | 89 tests passed in 15 files; no live API usage |
-| `npm run typecheck` | Passed |
-| `npm run build` | Passed |
-| Docker image build | Passed with Node.js 24 |
-| `docker compose up --build -d --wait` | Passed; one app service is healthy |
-| Runtime identity | Node.js 24.22.1; UID 1001 |
-| Docker health endpoint | HTTP 200 with `{ "status": "ok" }` |
-| Homepage | HTTP 200 |
-| Analysis without a configured key | Safe HTTP 503 / PROVIDER_NOT_CONFIGURED |
-| Invalid JSON | HTTP 400 |
-| Cross-origin browser submission | HTTP 403 |
-| Mislabeled image bytes | HTTP 415 |
-| Access through Mac Wi-Fi IP | Health endpoint returned HTTP 200 from the Mac |
-| Temporary visual QA route | Removed; production returns HTTP 404 |
-| Secret file in runtime image | `.env.local` absent |
+| Check                                 | Result                                          |
+| ------------------------------------- | ----------------------------------------------- |
+| `npm test`                            | 106 tests passed in 19 files; no live API usage |
+| `npm run typecheck`                   | Passed                                          |
+| `npm run build`                       | Passed                                          |
+| Docker image build                    | Passed with Node.js 24                          |
+| `docker compose up --build -d --wait` | Passed; one app service is healthy              |
+| Runtime identity                      | Node.js 24.22.1; UID 1001                       |
+| Docker health endpoint                | HTTP 200 with `{ "status": "ok" }`              |
+| Homepage                              | HTTP 200                                        |
+| Analysis without a configured key     | Safe HTTP 503 / PROVIDER_NOT_CONFIGURED         |
+| Invalid JSON                          | HTTP 400                                        |
+| Cross-origin browser submission       | HTTP 403                                        |
+| Mislabeled image bytes                | HTTP 415                                        |
+| Access through Mac Wi-Fi IP           | Health endpoint returned HTTP 200 from the Mac  |
+| Temporary visual QA route             | Removed; production returns HTTP 404            |
+| Secret file in runtime image          | `.env.local` absent                             |
 
 Tests cover schema rejection and sentence span bounds, French accents/contractions,
 source offsets and reconstruction, provider selection/configuration, malformed/refused
@@ -115,25 +115,69 @@ playback; completed playback dismissed the floating player. At 390px, the docume
 width remained 390px with no horizontal overflow. These checks verify browser
 events and controls; physical-device audible playback remains an owner check.
 
+## Saved history, learning games and monthly reviews
+
+The owner authorized this extension after the original V1. Implemented SQLite
+storage in the single app container, a persistent Docker volume, date/month keys
+in the household time zone, source-image retrieval, saved answer/practice attempts,
+requirement marks, history filtering, and redo without overwriting earlier work.
+Parent-review tasks have no numerical mark. Original-task passes unlock a short
+structured quiz with spelling, meanings, grammar and sound questions; all quiz
+attempts and versions are retained. An hourly in-process job prepares reviews for
+completed learning months and catches up after downtime, with leases and failure
+backoff. Current-month preview and explicit retry/update are available in the UI.
+
+The additional deterministic tests cover database close/reopen persistence, image
+bytes, date/month and daylight-saving boundaries, unrelated-note rejection,
+cross-lesson practice protection, marks, quiz answer validation, accent-sensitive
+grading, saved versions/redos, server-owned task binding, same-origin access,
+monthly statistics, provider-independent quiz generation, cached reopen without
+AI, monthly catch-up/backoff, and UI review/redo with pronunciation after marking.
+Spelling audio deliberately hides its target from visible playback status.
+
+Live production checks with synthetic material succeeded for:
+
+- Text analysis saved to history, a passing written answer and an unlocked lesson
+  quiz. The lesson quiz was marked 4/4 and its saved try remained available on redo.
+- A PNG note sent through the actual Gemini multimodal API; its transcription and
+  original source image are stored in the local database.
+- An unrelated shopping receipt rejected with an explanation; history stayed at
+  two records before and after the rejection.
+- Current-month progress and an AI summary quiz generated from both saved notes.
+  The monthly quiz was marked 4/4, then reopened from its saved attempt; French
+  answer audio remained enabled. Celebration controls were exercised; audible
+  output still requires the owner's device confirmation.
+- History and quizzes survived production-container rebuilds. The runtime remains
+  UID 1001, with mode 700 on its data directory and mode 600 on the SQLite file.
+- A homework redo saved a second 2/2 attempt while keeping the first 2/2 answer
+  and feedback. Monthly review detected the new work and offered an updated quiz
+  version while preserving the existing quiz and score.
+- Desktop journal layout and phone-width monthly layout. The monthly page and
+  marked quiz measured 390px document width at a 390px viewport without overflow.
+  The stored original image also loaded from history at that width without overflow.
+
+Only synthetic demonstration notes were used; no child's private homework was
+added to the repository. Automatic historical-month catch-up was verified with
+controlled-clock tests; the live database currently contains only the current
+month's demonstration notes. Physical-device checks below remain outstanding.
+
 ## Remaining acceptance checks
 
 The outstanding items below are required before declaring the full V1 definition
 of done in PROJECT_SPEC.md Section 33 complete:
 
-1. Analyze a synthetic note image through the live Gemini API. Text analysis has
-   already succeeded with the configured key; image transport is covered by mocks.
-2. Verify audible French on the owner's device. The browser has emitted actual
+1. Verify audible French on the owner's device. The browser has emitted actual
    start/finish events for original words, glossary words, and the full sentence.
-3. Try an actual homework photo without adding it to Git. Compare the transcription,
+2. Try an actual homework photo without adding it to Git. Compare the transcription,
    uncertainty warnings, English, and instructions with the original document.
-4. On a physical iPad/iPhone or another home Wi-Fi device, open the Mac's local address
+3. On a physical iPad/iPhone or another home Wi-Fi device, open the Mac's local address
    on port 3000 and complete both text and image workflows.
-5. Listen to individual words, contractions, and complete sentences in the target
+4. Listen to individual words, contractions, and complete sentences in the target
    browsers. Confirm the device's Canadian French voice, sound settings, and Stop.
 
 ## Deliberate limits
 
-HEIC conversion, working OpenAI/xAI adapters, cloud TTS, persistent history, accounts,
+HEIC conversion, working OpenAI/xAI adapters, cloud TTS, accounts,
 and cloud deployment remain future scope. Browser voice availability depends on the
 operating system. Complex layouts and handwriting may require parent correction.
-Gemini's own data-retention terms apply even though the application does not save notes.
+Gemini's own data-retention terms apply in addition to the application's local history.

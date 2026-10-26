@@ -17,12 +17,20 @@ export function HomeworkHelper() {
   const [file, setFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [analysis, setAnalysis] = useState<HomeworkAnalysis | null>(null);
+  const [lessonId, setLessonId] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const controller = useRef<AbortController | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const results = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const correction = sessionStorage.getItem("french-correction");
+    if (correction) {
+      setText(correction);
+      sessionStorage.removeItem("french-correction");
+    }
+  }, []);
   useEffect(() => {
     if (!file) {
       setImageUrl("");
@@ -35,6 +43,7 @@ export function HomeworkHelper() {
   useEffect(() => () => controller.current?.abort(), []);
   function clearResult() {
     setAnalysis(null);
+    setLessonId(undefined);
     setError("");
   }
   function changeMode(next: "text" | "image") {
@@ -105,6 +114,7 @@ export function HomeworkHelper() {
         );
       if (controller.current !== current) return;
       setAnalysis(result.data.data);
+      setLessonId(result.data.lessonId);
       setTimeout(() => {
         results.current?.focus();
         results.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -272,8 +282,9 @@ export function HomeworkHelper() {
             )}
           </div>
           <p className="privacy-note">
-            Your note is sent to the configured AI provider for analysis. This
-            app doesn’t save your homework.
+            French-study notes, original photos and checked answers are saved on
+            this Mac for household review. Unrelated material is discarded. Your
+            note is sent to the configured AI provider for analysis.
           </p>
           <div className="sr-only" role="status" aria-live="polite">
             {loading
@@ -289,7 +300,19 @@ export function HomeworkHelper() {
       )}
       {analysis ? (
         <div ref={results} tabIndex={-1} className="results-focus">
-          <HomeworkResults analysis={analysis} onCorrect={correct} />
+          {lessonId && (
+            <p className="saved-notice">
+              ✓ Saved to your learning history.{" "}
+              <a href={`/history/${lessonId}`}>
+                Review this note and all attempts
+              </a>
+            </p>
+          )}
+          <HomeworkResults
+            analysis={analysis}
+            onCorrect={correct}
+            lessonId={lessonId}
+          />
         </div>
       ) : (
         !loading && (

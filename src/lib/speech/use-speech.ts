@@ -51,31 +51,37 @@ export function useSpeech() {
     setStarted(false);
     setFinished("");
   }, []);
-  const speak = useCallback((text: string) => {
-    if (!provider.current) return;
-    setError("");
-    setSpeaking(true);
-    setCurrentText(text);
-    setStarted(false);
-    setFinished("");
-    try {
-      provider.current.speak(text, {
-        locale: "fr-CA",
-        onStart: () => setStarted(true),
-        onEnd: () => {
-          setSpeaking(false);
-          setFinished(text);
-        },
-        onError: (message) => {
-          setError(message);
-          setSpeaking(false);
-        },
-      });
-    } catch {
-      setSpeaking(false);
-      setError("Pronunciation couldn't start. Please try again.");
-    }
-  }, []);
+  const speak = useCallback(
+    (text: string, options?: { hideText?: boolean }) => {
+      if (!provider.current) return;
+      const displayText = options?.hideText
+        ? "Spelling word — listen carefully"
+        : text;
+      setError("");
+      setSpeaking(true);
+      setCurrentText(displayText);
+      setStarted(false);
+      setFinished("");
+      try {
+        provider.current.speak(text, {
+          locale: "fr-CA",
+          onStart: () => setStarted(true),
+          onEnd: () => {
+            setSpeaking(false);
+            setFinished(displayText);
+          },
+          onError: (message) => {
+            setError(message);
+            setSpeaking(false);
+          },
+        });
+      } catch {
+        setSpeaking(false);
+        setError("Pronunciation couldn't start. Please try again.");
+      }
+    },
+    [],
+  );
   return {
     speak,
     stop,

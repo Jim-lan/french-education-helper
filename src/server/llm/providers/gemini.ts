@@ -6,7 +6,13 @@ import {
 } from "@/lib/homework/schema";
 import { AppError } from "@/server/errors";
 import { readLimitedBody } from "@/server/http";
-import { HOMEWORK_PROMPT, ANSWER_REVIEW_PROMPT } from "../prompt";
+import { HOMEWORK_PROMPT, ANSWER_REVIEW_PROMPT, QUIZ_PROMPT } from "../prompt";
+import {
+  QuizContentSchema,
+  QuizPackSchema,
+  type LearningContext,
+  type QuizPack,
+} from "@/lib/learning/quiz";
 import {
   ReviewContentSchema,
   AnswerReviewSchema,
@@ -99,6 +105,8 @@ export class GeminiProvider implements LLMProvider {
         502,
       );
     const content = parsed.data;
+    if (!content.isFrenchStudy)
+      throw new AppError("UNRELATED_INPUT", content.relevanceExplanation);
     if (!content.originalFrench.trim())
       throw new AppError(
         "UNREADABLE_INPUT",
@@ -121,6 +129,25 @@ export class GeminiProvider implements LLMProvider {
       throw new AppError(
         "INVALID_AI_RESPONSE",
         "The feedback was incomplete. Please check your answer again.",
+        502,
+      );
+    return result.data;
+  }
+  async generateQuiz(
+    input: LearningContext,
+    { signal }: { signal: AbortSignal },
+  ): Promise<QuizPack> {
+    const raw = await this.generate(
+      [{ text: JSON.stringify(input) }],
+      QUIZ_PROMPT,
+      QuizContentSchema,
+      signal,
+    );
+    const result = QuizPackSchema.safeParse(raw);
+    if (!result.success)
+      throw new AppError(
+        "INVALID_AI_RESPONSE",
+        "The quiz was incomplete. Please try preparing it again.",
         502,
       );
     return result.data;

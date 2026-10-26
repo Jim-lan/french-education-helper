@@ -2,87 +2,34 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { ReviewResponseSchema, type AnswerReview } from "@/lib/homework/review";
 import { FrenchAudioText } from "./FrenchAudioText";
-
-function Feedback({ review }: { review: AnswerReview }) {
-  return (
-    <div className={`answer-feedback ${review.status}`}>
-      <h4>
-        {review.status === "passed"
-          ? "Nice work — task complete!"
-          : review.status === "needs_work"
-            ? "A little more practice"
-            : "Let's check with a parent"}
-      </h4>
-      <p role="status">{review.summaryEnglish}</p>
-      {review.requirements.length > 0 && (
-        <ul className="requirements">
-          {review.requirements.map((item, index) => (
-            <li key={index}>
-              <span
-                className={item.met ? "requirement-met" : "requirement-missed"}
-              >
-                {item.met ? "✓ Met" : "Try again"}
-              </span>
-              <div>
-                <strong>{item.requirementEnglish}</strong>
-                <p>{item.feedbackEnglish}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-      {review.strengths.length > 0 && (
-        <>
-          <h5>What went well</h5>
-          <ul>
-            {review.strengths.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </>
-      )}
-      {review.improvements.length > 0 && (
-        <>
-          <h5>Your next step</h5>
-          <ul>
-            {review.improvements.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </>
-      )}
-      {review.frenchExamples?.length > 0 && (
-        <section
-          className="french-examples"
-          aria-label="French examples to learn from"
-        >
-          <h5>Examples to learn from</h5>
-          {review.frenchExamples.map((example, index) => (
-            <div key={index}>
-              <FrenchAudioText
-                text={example.french}
-                label={`French example ${index + 1}`}
-                readLabel="Read this example in French"
-              />
-              <p>{example.english}</p>
-            </div>
-          ))}
-        </section>
-      )}
-    </div>
-  );
-}
+import { Feedback } from "./Feedback";
+import { AttemptHistory } from "./AttemptHistory";
+import { GameLauncher } from "./GameLauncher";
+import type { StudyAttempt } from "@/lib/learning/types";
 
 function AnswerAttempt({
   originalFrench,
   practice = false,
+  lessonId,
+  parentAttemptId,
+  initialAttempt,
+  onSaved,
+  onPassed,
 }: {
   originalFrench: string;
   practice?: boolean;
+  lessonId?: string;
+  parentAttemptId?: string;
+  initialAttempt?: StudyAttempt;
+  onSaved?: () => void;
+  onPassed?: () => void;
 }) {
   const id = useId();
-  const [answer, setAnswer] = useState("");
-  const [review, setReview] = useState<AnswerReview | null>(null);
+  const [answer, setAnswer] = useState(initialAttempt?.answer || "");
+  const [review, setReview] = useState<AnswerReview | null>(
+    initialAttempt?.review || null,
+  );
+  const [attemptId, setAttemptId] = useState(initialAttempt?.id);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const controller = useRef<AbortController | null>(null);
@@ -100,7 +47,13 @@ function AnswerAttempt({
       const response = await fetch("/api/review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ originalFrench, answer }),
+        body: JSON.stringify({
+          originalFrench,
+          answer,
+          ...(lessonId
+            ? { lessonId, ...(parentAttemptId ? { parentAttemptId } : {}) }
+            : {}),
+        }),
         signal: current.signal,
       });
       const result = ReviewResponseSchema.safeParse(await response.json());
@@ -109,7 +62,12 @@ function AnswerAttempt({
       if (!result.data.ok) throw new Error(result.data.error.message);
       if (!response.ok)
         throw new Error("The answer couldn't be checked. Please try again.");
-      if (controller.current === current) setReview(result.data.data);
+      if (controller.current === current) {
+        setReview(result.data.data);
+        setAttemptId(result.data.attemptId);
+        if (!practice && result.data.data.status === "passed") onPassed?.();
+        onSaved?.();
+      }
     } catch (failure) {
       if (controller.current === current)
         setError(
@@ -193,6 +151,20 @@ function AnswerAttempt({
               Cancel answer check
             </button>
           )}
+          {!loading && review && (
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => {
+                setAnswer("");
+                setReview(null);
+                setAttemptId(undefined);
+                setError("");
+              }}
+            >
+              {practice ? "Redo practice" : "Redo teacher’s task"}
+            </button>
+          )}
         </div>
         <p className="privacy-note">
           Your answer is sent to the configured AI provider only when you choose
@@ -209,7 +181,7 @@ function AnswerAttempt({
         <p className="completion-message">
           {practice
             ? "Practice complete! Now revise your original homework answer above and check it again."
-            : "You have finished the basic task. Spelling and similar-sound games are planned for the next stage."}
+            : "You have finished the basic task. Try the learning game below to practise spelling, meanings and sounds."}
         </p>
       )}
       {!practice && review?.status === "needs_work" && review.practice && (
@@ -233,6 +205,9 @@ function AnswerAttempt({
             key={review.practice.instructionFrench}
             originalFrench={review.practice.instructionFrench}
             practice
+            lessonId={lessonId}
+            parentAttemptId={attemptId}
+            onSaved={onSaved}
           />
         </section>
       )}
@@ -241,9 +216,19 @@ function AnswerAttempt({
 }
 export function AnswerWorkspace({
   originalFrench,
+  lessonId,
+  attempts = [],
+  onSaved,
 }: {
   originalFrench: string;
+  lessonId?: string;
+  attempts?: StudyAttempt[];
+  onSaved?: () => void;
 }) {
+  const [justPassed, setJustPassed] = useState(false);
+  const unlocked =
+    justPassed ||
+    attempts.some((a) => a.kind === "homework" && a.review.status === "passed");
   return (
     <section className="answer-workspace" aria-labelledby="answer-heading">
       <p className="eyebrow">TRY THE TEACHER’S TASK FIRST</p>
@@ -253,7 +238,16 @@ export function AnswerWorkspace({
         teacher’s requirements and help you improve. A parent can review the
         feedback with you.
       </p>
-      <AnswerAttempt key={originalFrench} originalFrench={originalFrench} />
+      <AnswerAttempt
+        key={originalFrench}
+        originalFrench={originalFrench}
+        lessonId={lessonId}
+        initialAttempt={attempts.filter((a) => a.kind === "homework").at(-1)}
+        onSaved={onSaved}
+        onPassed={() => setJustPassed(true)}
+      />
+      {lessonId && unlocked && <GameLauncher kind="lesson" scope={lessonId} />}
+      <AttemptHistory attempts={attempts} />
     </section>
   );
 }

@@ -28,6 +28,8 @@ export async function analyzeHomework(
       "The AI returned an incomplete explanation. Please try again.",
       502,
     );
+  if (!content.data.isFrenchStudy)
+    throw new AppError("UNRELATED_INPUT", content.data.relevanceExplanation);
   const originalFrench =
     input.kind === "text" ? input.text : content.data.originalFrench;
   return HomeworkAnalysisSchema.parse({
