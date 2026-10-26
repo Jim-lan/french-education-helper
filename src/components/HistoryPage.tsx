@@ -57,7 +57,7 @@ export function HistoryPage() {
         <h1>Our learning journal.</h1>
         <p>
           Find a note, listen again, compare marks, and give it another try.
-          Every checked attempt stays saved on this Mac.
+          Every checked attempt stays saved on your home server.
         </p>
       </section>
       <div className="history-filters">

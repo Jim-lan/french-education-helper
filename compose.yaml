@@ -1,3 +1,4 @@
+name: french-education-helper
 services:
   app:
     build: .

@@ -161,6 +161,36 @@ added to the repository. Automatic historical-month catch-up was verified with
 controlled-clock tests; the live database currently contains only the current
 month's demonstration notes. Physical-device checks below remain outstanding.
 
+## Portable installation and delivery
+
+The application runtime has no macOS paths or platform-specific APIs. Docker
+builds the matching Linux image for the host CPU. UI storage labels now refer to
+the home server; the original Mac deployment remains one supported installation.
+README.md includes complete macOS, Windows/PowerShell and Linux setup, private
+configuration, startup/health, LAN access, maintenance, backup and troubleshooting.
+The Compose project name is fixed to preserve the same volume across folder names.
+
+`scripts/start.sh` and `scripts/start.ps1` preserve existing `.env.local`; a missing
+file is created from the blank template and startup stops for key configuration.
+The shell launcher was exercised from a path containing spaces with a test Docker
+command: private template permissions, first-run stop, key-file preservation and
+the final Compose arguments all passed. The real shell launcher also starts the
+existing Docker installation. The PowerShell script was reviewed for Windows
+PowerShell-compatible syntax but was not executed on a Windows host.
+
+An x86-64 (`linux/amd64`) image was built and run with emulation on the ARM64
+development computer. Health returned 200; empty SQLite history and monthly
+statistics worked, and an absent API key produced the expected safe 503. No
+credentials were supplied to this temporary test container; it was removed after
+the checks. ARM64 Docker builds/startup have also passed on the development host.
+These runtime checks are not physical Windows/Linux-host certification.
+
+`npm run package:install` builds a versioned ZIP from committed Git HEAD using an
+explicit file allowlist. It emits a SHA-256 checksum and revision manifest. Local
+secrets, SQLite data and generated builds are excluded; recipients build through
+Docker without installing host Node.js. This is a portable Docker installation
+bundle with an online first build, not a native desktop installer or offline image.
+
 ## Remaining acceptance checks
 
 The outstanding items below are required before declaring the full V1 definition

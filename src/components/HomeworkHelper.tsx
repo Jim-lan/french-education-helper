@@ -283,8 +283,9 @@ export function HomeworkHelper() {
           </div>
           <p className="privacy-note">
             French-study notes, original photos and checked answers are saved on
-            this Mac for household review. Unrelated material is discarded. Your
-            note is sent to the configured AI provider for analysis.
+            your home server for household review. Unrelated material is
+            discarded. Your note is sent to the configured AI provider for
+            analysis.
           </p>
           <div className="sr-only" role="status" aria-live="polite">
             {loading

@@ -7,86 +7,226 @@ Paste French text or upload a teacher's homework note, compare the original with
 a natural English translation and simple instructions, and tap French words or
 sentences to hear them pronounced.
 
-**Status:** V1 implementation is available. Automated tests, production builds,
-Docker startup, and responsive browser checks have passed. Live text analysis
-and answer feedback have been exercised with synthetic homework. Configure your
-API key for a fresh installation; physical iPad/iPhone and audible-device checks
-remain to be completed. See [validation results](docs/VALIDATION.md).
+**Delivery status:** the requested local learning workflow is implemented: text/photo
+analysis, French pronunciation, answer checking and practice, saved history/marks,
+redo, lesson games and monthly summary quizzes. The application uses a Linux
+Docker container and is designed for **macOS, Windows and Linux hosts**. Physical
+Windows/Linux-host and iPad/iPhone acceptance checks are recorded separately from
+container checks in [VALIDATION.md](docs/VALIDATION.md). OpenAI/xAI adapters, HEIC
+conversion, accounts and cloud publishing remain future scope.
 
-## Start on your Mac
+## Install and run — step by step
 
-Install and start Docker Desktop, then open a terminal in this project folder.
+The recommended installation uses Docker. **You do not need to install Node.js,
+npm, SQLite or an LLM SDK on the host computer.** Internet access is required for
+the first image build and for new Gemini requests. Each computer you install on
+has its own learning database; devices using the same server share its history.
 
-1. Create your private configuration file if it does not already exist:
+### 1. Install and start Docker
 
-   ```sh
-   cp .env.example .env.local
-   ```
+| Host computer                  | Install                                                                                                                                                  | Terminal to use |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| macOS (Apple silicon or Intel) | [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)                                                                     | Terminal        |
+| Windows                        | [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/), following its WSL 2 requirements; use **Linux containers** | PowerShell      |
+| Linux                          | [Docker Engine](https://docs.docker.com/engine/install/) with the [Compose plugin](https://docs.docker.com/compose/install/linux/), or Docker Desktop    | Terminal        |
 
-   Skip this command if you have already configured `.env.local`, so you keep
-   your existing key. The initial local workspace may already have a blank copy.
-
-2. Edit `.env.local` locally:
-
-   ```dotenv
-   LLM_PROVIDER=gemini
-   LLM_MODEL=gemini-3.1-flash-lite
-   GEMINI_API_KEY=your-api-key
-   ```
-
-   Obtain an API key through [Google AI Studio](https://aistudio.google.com/apikey).
-   Do not paste your key into chat or commit it to Git. Model availability and
-   quotas depend on your provider account. The model is configurable; the default
-   is documented in [Google's model reference](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite).
-
-3. Start the single container:
-
-   ```sh
-   docker compose up -d
-   ```
-
-   The first start builds the image and downloads dependencies. It needs internet
-   access. Open [French Education Helper](http://localhost:3000) on the Mac.
-
-After changing application code:
+Start Docker Desktop and wait for its engine to be ready. On a Linux Engine
+installation, ensure the Docker service is running and your user can run Docker
+according to the official installation instructions. Check:
 
 ```sh
-docker compose up --build -d
+docker version
+docker compose version
 ```
 
-After changing API credentials or model configuration, recreate the container:
+Use Docker Compose **2.24 or newer**. Docker Desktop includes Compose. If Docker
+cannot connect, start the engine before continuing. Docker Desktop's supported OS
+versions and licensing are described in the installation links above.
+
+### 2. Get the application
+
+**Option A — installation ZIP:** extract the supplied
+`french-education-helper-<version>-<commit>.zip`, then open a terminal in its
+`french-education-helper` folder. Keep this folder for configuration and updates.
+The ZIP includes application source, Docker configuration and launch scripts;
+Docker builds the application on first start. It contains no API keys or homework.
+
+**Option B — Git:** if Git is installed, run:
 
 ```sh
-docker compose up -d --force-recreate
+git clone https://github.com/Jim-lan/french-education-helper.git
+cd french-education-helper
 ```
 
-Useful commands:
+If you already have this project, use your existing folder and skip cloning.
+
+### 3. Create your private configuration
+
+If `.env.local` already exists, **keep it** and skip the copy command.
+
+macOS / Linux:
+
+```sh
+cp .env.example .env.local
+chmod 600 .env.local
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+Open `.env.local` in a local text editor, for example `nano .env.local` on
+macOS/Linux or `notepad .env.local` on Windows. Enter:
+
+```dotenv
+LLM_PROVIDER=gemini
+LLM_MODEL=gemini-3.1-flash-lite
+GEMINI_API_KEY=your-actual-api-key
+APP_TIMEZONE=America/Toronto
+```
+
+Obtain a key at [Google AI Studio](https://aistudio.google.com/apikey). Save the
+file as exactly `.env.local`, not `.env.local.txt`. Do not paste the key into chat
+or commit it to Git. The existing installation's configured key is not included
+in Git or installation bundles. Model availability and quota depend on your
+provider account; [the default model reference](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite)
+describes the configured model. Set your household time zone before adding notes.
+
+### 4. Build and start
+
+Run the same command on all three operating systems:
+
+```sh
+docker compose up --build -d --wait --wait-timeout 120
+```
+
+The first build downloads dependencies and may take several minutes. This runs
+one app container and creates persistent learning storage. Subsequent starts
+reuse the image and database. The Compose project is explicitly named
+`french-education-helper`, so extracting an update into a differently named
+folder does not silently select a different database on the same Docker engine.
+
+Convenience launchers perform the same startup from any working directory:
+
+```sh
+# macOS / Linux, from the project folder
+sh scripts/start.sh
+```
+
+```powershell
+# Windows, from the project folder
+.\scripts\start.ps1
+```
+
+If PowerShell execution policy blocks the optional script, use the direct Docker
+command above; no execution-policy change is required.
+The launchers preserve existing configuration. If `.env.local` is missing, they
+create a blank template and stop so you can add the API key before starting.
+
+### 5. Confirm it is running
 
 ```sh
 docker compose ps
+```
+
+The `app` service should show **healthy**. Open these pages on the server computer:
+
+- [New homework](http://localhost:3000/)
+- [Learning history](http://localhost:3000/history)
+- [Monthly review](http://localhost:3000/monthly)
+- [Health endpoint](http://localhost:3000/api/health) — returns `{"status":"ok"}`
+
+A healthy container verifies the web server; it does not validate the API key or
+consume AI quota. Choose **Try this note → Help me understand** to check Gemini.
+Write an answer and check it, then open history to confirm it is saved. Try a
+JPEG/PNG homework image and French word/sentence audio as the final device check.
+
+### 6. Connect a phone, iPad or another computer
+
+Connect the client device to the same home network as the server. Find the
+**server computer's home-network IPv4 address**:
+
+| Server OS | Find its address                                                               |
+| --------- | ------------------------------------------------------------------------------ |
+| macOS     | System Settings → Network/Wi-Fi → connection details → TCP/IP                  |
+| Windows   | Run `ipconfig`; find the IPv4 address for the connected Wi-Fi/Ethernet adapter |
+| Linux     | Run `ip -4 addr`; use the address on the connected Wi-Fi/Ethernet interface    |
+
+On the client device, open:
+
+```text
+http://<server-IP-address>:3000
+```
+
+For example, if the server address is `192.168.1.20`, use
+`http://192.168.1.20:3000`. `localhost` on a phone points to the phone itself.
+Use the same server address to access the same shared history from every device.
+
+The app binds to `0.0.0.0:3000`. Allow access on your trusted home/private network
+if the host firewall prompts; guest Wi-Fi and client isolation can block it.
+**The server computer must remain awake with Docker running.** The screen may be
+off or locked. Monthly jobs catch up after downtime. This installation is for a
+trusted household network; do not expose port 3000 to the public internet.
+
+On iPhone/iPad, upload from Photo Library, Take Photo, or Choose Files as offered
+by the device. Photos are in Photos; downloaded images are usually in Files.
+The app accepts JPEG/PNG/WebP; create a compatible copy if the file is HEIC or PDF.
+A saved accepted note is stored on the server, regardless of which device uploads it.
+
+### 7. Stop, restart and update
+
+These commands work from the project folder on macOS, Windows and Linux:
+
+```sh
+# Stop temporarily; keep the container and history
+docker compose stop
+
+# Resume
+docker compose start
+
+# Inspect startup errors
 docker compose logs --tail=50 app
+
+# Stop and remove the container; preserve the learning volume
 docker compose down
 ```
 
-The built-in health check uses `/api/health`. A healthy container means the app
-is serving HTTP; it does not verify provider credentials or consume AI quota.
+For a Git installation, save any local code edits and update with:
 
-## Open it from an iPad, iPhone, or another computer
-
-Connect the device to the same home Wi-Fi as the Mac. Find the Mac's Wi-Fi IP in
-System Settings → Wi-Fi → Details → TCP/IP, then open:
-
-```text
-http://<Mac-Wi-Fi-IP>:3000
+```sh
+git pull --ff-only
+docker compose up --build -d --wait --wait-timeout 120
 ```
 
-The app and published port listen on `0.0.0.0:3000`. No specific local address is
-hard-coded. Allow incoming connections through the Mac firewall if prompted;
-guest Wi-Fi or client isolation may prevent devices reaching one another.
+For a ZIP installation, extract the new bundle, copy your existing `.env.local`
+into the new project folder, and run the startup command there on the same Docker
+engine. Keep the configuration private. The named learning volume remains shared
+with the previous installation on that engine. Moving to another computer requires
+transferring a database backup and configuring the key there separately.
 
-**The Mac must stay awake with Docker running.** The display can be off and the
-Mac can be locked. System sleep or shutdown makes the app unavailable. This V1
-is intended for a trusted home network; do not configure internet port forwarding.
+After changing only credentials or model configuration:
+
+```sh
+docker compose up -d --force-recreate --wait --wait-timeout 120
+```
+
+**Do not run `docker compose down -v` when you want to keep history.** It removes
+the learning volume. See the backup instructions below before moving computers.
+
+### Troubleshooting
+
+| Symptom                             | What to check                                                                                                          |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Cannot connect to Docker            | Start Docker Desktop or the Linux Docker service; check `docker info`                                                  |
+| Compose rejects `env_file.required` | Update Docker Desktop / Compose to 2.24 or newer                                                                       |
+| Port 3000 is already in use         | Stop the other app using it; this project expects port 3000                                                            |
+| Healthy app, but AI fails           | Check the server-side key, model, internet access and provider quota; recreate the container after configuration edits |
+| Phone cannot connect                | Use the server's LAN address, keep the host awake, check private-network firewall access and Wi-Fi isolation           |
+| Windows image/OS mismatch           | Select Linux containers in Docker Desktop                                                                              |
+| No French sound                     | Check device volume and French speech voices; try Safari/Chrome and verify fr-CA support                               |
+| History seems missing after moving  | Confirm the same Docker engine/project volume is used, or restore the old server's backup                              |
 
 ## Use the app
 
@@ -176,7 +316,7 @@ zone before collecting history; existing date/month keys remain unchanged.
 
 ## Saved data and backup
 
-Docker Compose stores SQLite and original images in the named
+Docker Compose stores SQLite and original images on the server computer in the named
 `french-education-helper_learning_data` volume mounted at `/app/data`. Container
 rebuilds and ordinary `docker compose down` preserve it. **Do not use `down -v`**
 when you want to keep learning history. Local development uses ignored `./data/`,
@@ -232,7 +372,7 @@ See the browser's [paused speech behavior](https://developer.mozilla.org/en-US/d
 - One process handles up to 2 concurrent analyses and 20 requests per minute.
 
 Accepted French-study notes, original images, explanations, checked answers,
-marks, practice attempts and quizzes are saved in SQLite on the Mac. Unrelated
+marks, practice attempts and quizzes are saved in SQLite on the server computer. Unrelated
 material is rejected with an explanation and is not retained. Responses are
 uncached. Everyone who can reach this household app can view the shared history;
 there are no separate student accounts. Submitted content is sent to the configured
@@ -244,6 +384,21 @@ real `.env` files are ignored by Git and excluded from Docker build context.
 `.env.example` contains no secrets. Never use `NEXT_PUBLIC_` for keys, add keys to
 source code, or include credentials in logs. The app uses provider APIs, not
 consumer AI website logins.
+
+## Creating an installation bundle
+
+Maintainers with Git and Node.js 24 can package a **committed** revision:
+
+```sh
+npm run package:install
+```
+
+This creates a versioned ZIP, SHA-256 checksum and revision manifest in ignored
+`dist/`. Packaging reads a fixed allowlist of files from Git HEAD, so untracked
+configuration, local databases, uploads and build artifacts are excluded. Commit
+changes first. Recipients only need Docker, the ZIP and their own API key; Node.js
+is needed for creating a bundle, not installing it. This is a Docker installation
+bundle, not a native `.dmg`/`.exe` installer or a prebuilt offline image.
 
 ## Development
 
